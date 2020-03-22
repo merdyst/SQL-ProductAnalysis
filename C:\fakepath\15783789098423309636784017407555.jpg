@@ -1,0 +1,71 @@
+SELECT 
+  t.title AS 'Page',
+  st.number AS 'Stock Number',
+  sup.name AS Supplier,
+  br.name AS Brand,
+  pr.title AS Product,
+  s.name AS 'SKU Name',
+  st.`quantity` AS Stock,
+  st.hold AS Hold,
+  st.quantity - st.hold AS 'Qty Available',
+    QS7.qty AS 'Qty Sold',
+
+  CASE WHEN s.sale IS NOT NULL THEN s.sale ELSE s.price END AS 'unit Price'
+
+FROM
+  products pr 
+  LEFT JOIN skus s 
+    ON pr.id = s.product_id 
+  LEFT JOIN 
+    (SELECT 
+      i.`sku_id` AS sku_id,
+      SUM(i.quantity) AS qty 
+    FROM
+      order_items i 
+      JOIN orders o 
+        ON i.`order_id` = o.`id` 
+      JOIN skus s 
+        ON i.sku_id = s.id 
+      JOIN products pr 
+        ON s.product_id = pr.id 
+    WHERE (o.status = 150 
+        OR o.status = 1000) 
+      AND o.number NOT LIKE 'R%' 
+      AND o.createdAt <= NOW() 
+      AND o.createdAt >= DATE_SUB(NOW(), INTERVAL 8 DAY) 
+    GROUP BY i.sku_id) AS QS7 
+    ON QS7.sku_id = s.id 
+  JOIN skus_stocks ss 
+    ON s.`id` = ss.`sku_id` 
+  JOIN stocks st 
+    ON ss.stock_id = st.id 
+  JOIN products_pages pp 
+    ON pr.id = pp.product_id 
+  JOIN pages pg 
+    ON pp.page_id = pg.id 
+  JOIN brands br 
+    ON pr.`brand_id` = br.id 
+  JOIN suppliers sup 
+    ON br.`supplier_id` = sup.id 
+  JOIN products_tags pt 
+    ON pt.product_id = pr.id 
+  JOIN tags t 
+    ON pt.tag_id = t.id 
+WHERE pg.`filter_sidebar` = 1 AND
+(
+
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+t.`title` = "" OR
+
+)
+GROUP BY st.number 
+ORDER BY st.number ASC 
